@@ -65,7 +65,100 @@
 
   <script>
     "use strict";
-    // Код писать здесь
-    console.log("It works!");
+      const userName = document.querySelector('.add-form-name');
+      const userComment = document.querySelector('.add-form-text');
+      const addButton = document.querySelector('.add-form-button');
+      const commentElement = document.querySelector('.comments');
+
+      const comments = [
+        {
+          name: 'Глеб Фокин',
+          comment: 'Это будет первый комментарий на этой странице',
+          date: '12.02.22 12:18',
+          like: '3',
+          iLike: false,
+        },
+        {
+          name: 'Варвара Н.',
+          comment: 'Мне нравится как оформлена эта страница! ❤',
+          date: '13.02.22 19:22',
+          like: '75',
+          iLike: true,
+        }
+      ];
+
+      const renderComments =  () => {
+        const commentsHtml = comments.map((comments) => {
+          return `<li class="comment">
+          <div class="comment-header">
+            <div>${comments.name}</div>
+            <div>${comments.date}</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">${comments.comment}</div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">${comments.like}</span>
+              <button class="like-button">${comments.iLike}</button>
+            </div>
+          </div>
+        </li>`
+        }).join('');
+
+        commentElement.innerHTML = commentsHtml;
+      }
+
+      //добавление комментария
+      addButton.addEventListener('click', () => {
+        const oldCommentHtml = commentElement.innerHTML; 
+        commentElement.innerHTML = oldCommentHtml + 
+        `<li class="comment">
+          <div class="comment-header">
+            <div>${userName.value}</div>
+            <div>${formattedDate}</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">${userComment.value}</div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">0</span>
+              <button class="like-button"></button>
+            </div>
+          </div>
+        </li>`
+        userComment.value = '';
+        userName.value = '';
+      });
+
+      //валидация полей имя и комментарий
+      function prov() {
+        if (userName.value === '' && userComment.value === '') {
+        addButton.disabled = true;
+      }}
+      prov();
+
+        userComment.addEventListener('input', function () {
+          if (userName.value === '' || userComment.value === '') {
+            addButton.disabled = true;
+          } else {
+            addButton.disabled = false;
+          }
+        })
+        userName.addEventListener('input', function () {
+          if (userName.value === '' || userComment.value === '') {
+            addButton.disabled = true;
+          } else {
+            addButton.disabled = false;
+          };
+        });
+
+        //дата
+        const currentDate = new Date();
+        const optionsDate = { year: 'numeric', month: 'numeric', day: 'numeric' };
+        const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        const formattedDate = currentDate.toLocaleDateString('ru-RU', optionsDate) + ' ' + currentDate.toLocaleTimeString('ru-RU', optionsTime);
+        
   </script>
 </html>
