@@ -75,20 +75,33 @@
           name: 'Глеб Фокин',
           comment: 'Это будет первый комментарий на этой странице',
           date: '12.02.22 12:18',
-          like: '3',
+          like: 3,
           iLike: false,
         },
         {
           name: 'Варвара Н.',
           comment: 'Мне нравится как оформлена эта страница! ❤',
           date: '13.02.22 19:22',
-          like: '75',
+          like: 75,
           iLike: true,
         }
       ];
 
+      const initLikeButton = () => {
+        const likeButtonElements = document.querySelectorAll('.like-button');
+        for (let likeButtonElement of likeButtonElements) {
+          likeButtonElement.addEventListener('click', () =>{
+            const index = likeButtonElement.dataset.index;
+            comments[index].like += comments[index].iLike ? -1 : +1;
+            comments[index].iLike = !comments[index].iLike;
+
+            renderComments();
+          })
+        }
+      }
+
       const renderComments =  () => {
-        const commentsHtml = comments.map((comments) => {
+        const commentsHtml = comments.map((comments, index) => {
           return `<li class="comment">
           <div class="comment-header">
             <div>${comments.name}</div>
@@ -100,34 +113,29 @@
           <div class="comment-footer">
             <div class="likes">
               <span class="likes-counter">${comments.like}</span>
-              <button class="like-button">${comments.iLike}</button>
+              <button data-index='${index}' class="like-button ${comments.iLike ? '-active-like' : ''}"></button>
             </div>
           </div>
         </li>`
         }).join('');
-
+        
         commentElement.innerHTML = commentsHtml;
+        initLikeButton();
       }
+      renderComments()
+
+
 
       //добавление комментария
       addButton.addEventListener('click', () => {
-        const oldCommentHtml = commentElement.innerHTML; 
-        commentElement.innerHTML = oldCommentHtml + 
-        `<li class="comment">
-          <div class="comment-header">
-            <div>${userName.value}</div>
-            <div>${formattedDate}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">${userComment.value}</div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">0</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>`
+        comments.push({
+          name: userName.value,
+          comment: userComment.value,
+          date: formattedDate,
+          like: 0, 
+          iLike: false,
+        })
+        renderComments();
         userComment.value = '';
         userName.value = '';
       });
@@ -139,25 +147,25 @@
       }}
       prov();
 
-        userComment.addEventListener('input', function () {
-          if (userName.value === '' || userComment.value === '') {
-            addButton.disabled = true;
-          } else {
+      userComment.addEventListener('input', function () {
+        if (userName.value === '' || userComment.value === '') {
+          addButton.disabled = true;
+        } else {
             addButton.disabled = false;
           }
-        })
-        userName.addEventListener('input', function () {
-          if (userName.value === '' || userComment.value === '') {
-            addButton.disabled = true;
-          } else {
-            addButton.disabled = false;
-          };
-        });
+      })
+      userName.addEventListener('input', function () {
+        if (userName.value === '' || userComment.value === '') {
+          addButton.disabled = true;
+        } else {
+          addButton.disabled = false;
+        };
+      });
 
         //дата
         const currentDate = new Date();
         const optionsDate = { year: 'numeric', month: 'numeric', day: 'numeric' };
-        const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        const optionsTime = { hour: '2-digit', minute: '2-digit'};
         const formattedDate = currentDate.toLocaleDateString('ru-RU', optionsDate) + ' ' + currentDate.toLocaleTimeString('ru-RU', optionsTime);
         
   </script>
