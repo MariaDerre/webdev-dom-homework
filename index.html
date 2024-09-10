@@ -11,7 +11,7 @@
       <ul class="comments">
         <li class="comment">
           <div class="comment-header">
-            <div>Глеб Фокин</div>
+            <div class="comment-name">Глеб Фокин</div>
             <div>12.02.22 12:18</div>
           </div>
           <div class="comment-body">
@@ -28,7 +28,7 @@
         </li>
         <li class="comment">
           <div class="comment-header">
-            <div>Варвара Н.</div>
+            <div class="comment-name">Варвара Н.</div>
             <div>13.02.22 19:22</div>
           </div>
           <div class="comment-body">
@@ -90,21 +90,36 @@
       const initLikeButton = () => {
         const likeButtonElements = document.querySelectorAll('.like-button');
         for (let likeButtonElement of likeButtonElements) {
-          likeButtonElement.addEventListener('click', () =>{
+          likeButtonElement.addEventListener('click', (event) =>{
             const index = likeButtonElement.dataset.index;
             comments[index].like += comments[index].iLike ? -1 : +1;
             comments[index].iLike = !comments[index].iLike;
-
+            event.stopPropagation();
             renderComments();
           })
         }
+      }
+
+      //ответ на комментарий
+      const answerComment = () => {
+      const boxOfComment = document.querySelectorAll('.comment');
+      for (const comment of boxOfComment) {
+        comment.addEventListener('click', () => {
+          const userName = document.querySelector('.comment-name').textContent;
+          const userComment = document.querySelector('.comment-body').textContent;
+          const textComment = document.querySelector('.add-form-text');
+          textComment.value = `>${userComment}${userName}`;
+
+          renderComments();
+        })
+      }
       }
 
       const renderComments =  () => {
         const commentsHtml = comments.map((comments, index) => {
           return `<li class="comment">
           <div class="comment-header">
-            <div>${comments.name}</div>
+            <div class="comment-name">${comments.name}</div>
             <div>${comments.date}</div>
           </div>
           <div class="comment-body">
@@ -121,16 +136,19 @@
         
         commentElement.innerHTML = commentsHtml;
         initLikeButton();
+        answerComment();
       }
       renderComments()
-
-
 
       //добавление комментария
       addButton.addEventListener('click', () => {
         comments.push({
-          name: userName.value,
-          comment: userComment.value,
+          name: userName.value
+          .replaceAll("<", '&lt')
+          .replaceAll(">", '&gt'),
+          comment: userComment.value
+          .replaceAll("<", '&lt')
+          .replaceAll(">", '&gt'),
           date: formattedDate,
           like: 0, 
           iLike: false,
