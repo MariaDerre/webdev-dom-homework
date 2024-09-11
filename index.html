@@ -70,22 +70,27 @@
       const addButton = document.querySelector('.add-form-button');
       const commentElement = document.querySelector('.comments');
 
-      const comments = [
-        {
-          name: 'Глеб Фокин',
-          comment: 'Это будет первый комментарий на этой странице',
-          date: '12.02.22 12:18',
-          like: 3,
-          iLike: false,
-        },
-        {
-          name: 'Варвара Н.',
-          comment: 'Мне нравится как оформлена эта страница! ❤',
-          date: '13.02.22 19:22',
-          like: 75,
-          iLike: true,
-        }
-      ];
+      let comments = [];
+
+      fetch('https://wedev-api.sky.pro/api/v1/maria-derre/comments', 
+      {
+        method: 'GET'
+      }).then((response) => {
+          response.json().then((responseData) =>{
+            console.log(responseData);
+
+            comments = responseData.comments.map((comment) => {
+              return {
+                name: comment.author.name,
+                date: new Date().toLocaleString(), 
+                text: comment.text,
+                likes: comment.likes,
+                isLiked: false,
+              };
+            })
+            renderComments();
+          }) 
+      })
 
       const initLikeButton = () => {
         const likeButtonElements = document.querySelectorAll('.like-button');
@@ -116,19 +121,19 @@
       }
 
       const renderComments =  () => {
-        const commentsHtml = comments.map((comments, index) => {
+        let commentsHtml = comments.map((comment, index) => {
           return `<li class="comment">
           <div class="comment-header">
-            <div class="comment-name">${comments.name}</div>
-            <div>${comments.date}</div>
+            <div class="comment-name">${comment.name}</div>
+            <div>${comment.date}</div>
           </div>
           <div class="comment-body">
-            <div class="comment-text">${comments.comment}</div>
+            <div class="comment-text">${comment.text}</div>
           </div>
           <div class="comment-footer">
             <div class="likes">
-              <span class="likes-counter">${comments.like}</span>
-              <button data-index='${index}' class="like-button ${comments.iLike ? '-active-like' : ''}"></button>
+              <span class="likes-counter">${comment.likes}</span>
+              <button data-index='${index}' class="like-button ${comment.iLike ? '-active-like' : ''}"></button>
             </div>
           </div>
         </li>`
@@ -142,17 +147,24 @@
 
       //добавление комментария
       addButton.addEventListener('click', () => {
-        comments.push({
-          name: userName.value
-          .replaceAll("<", '&lt')
-          .replaceAll(">", '&gt'),
-          comment: userComment.value
-          .replaceAll("<", '&lt')
-          .replaceAll(">", '&gt'),
-          date: formattedDate,
-          like: 0, 
-          iLike: false,
+        fetch("https://wedev-api.sky.pro/api/v1/maria-derre/comments",
+        {
+          method: "POST",
+          body: JSON.stringify({
+              name: userName.value
+                .replaceAll("<", '&lt')
+                .replaceAll(">", '&gt'),
+              text: userComment.value
+                .replaceAll("<", '&lt')
+                .replaceAll(">", '&gt'),
+          })
+        }).then((response) => {
+          response.json().then((responseData) => {
+            comments = responseData.comment; 
+            renderComments();
+          })
         })
+
         renderComments();
         userComment.value = '';
         userName.value = '';
