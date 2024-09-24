@@ -107,8 +107,12 @@
         for (let likeButtonElement of likeButtonElements) {
           likeButtonElement.addEventListener('click', (event) => {
             const index = likeButtonElement.dataset.index;
-            comments[index].like += comments[index].iLike ? -1 : +1;
-            comments[index].iLike = !comments[index].iLike;
+            comments[index].isLiked = !comments[index].isLiked;
+            if (comments[index].isLiked) {
+              comments[index].likes++
+            } else {
+              comments[index].likes--
+            }
             event.stopPropagation();
             renderComments();
           })
@@ -142,7 +146,7 @@
           <div class="comment-footer">
             <div class="likes">
               <span class="likes-counter">${comment.likes}</span>
-              <button data-index='${index}' class="like-button ${comment.iLike ? '-active-like' : ''}"></button>
+              <button data-index='${index}' class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
             </div>
           </div>
         </li>`
