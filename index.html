@@ -5,13 +5,15 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-
   <body>
+    <div id="preloader">
+      <div class="spinner"></div>
+    </div>
     <div class="container">
       <ul class="comments">
         <li class="comment">
           <div class="comment-header">
-            <div>Глеб Фокин</div>
+            <div class="comment-name">Глеб Фокин</div>
             <div>12.02.22 12:18</div>
           </div>
           <div class="comment-body">
@@ -28,7 +30,7 @@
         </li>
         <li class="comment">
           <div class="comment-header">
-            <div>Варвара Н.</div>
+            <div class="comment-name">Варвара Н.</div>
             <div>13.02.22 19:22</div>
           </div>
           <div class="comment-body">
@@ -70,66 +72,137 @@
       const addButton = document.querySelector('.add-form-button');
       const commentElement = document.querySelector('.comments');
 
-      const comments = [
-        {
-          name: 'Глеб Фокин',
-          comment: 'Это будет первый комментарий на этой странице',
-          date: '12.02.22 12:18',
-          like: '3',
-          iLike: false,
-        },
-        {
-          name: 'Варвара Н.',
-          comment: 'Мне нравится как оформлена эта страница! ❤',
-          date: '13.02.22 19:22',
-          like: '75',
-          iLike: true,
+      let comments = [];
+
+      const fetchAndRenderComments = () => {
+      fetch('https://wedev-api.sky.pro/api/v1/maria-derre/comments', 
+      {
+        method: 'GET'
+      }).then((response) => {
+        if (response.status === 200) {
+          return response.json()
+        } else if (response.status === 500){
+          alert ("Сервер сломался, попробуй позже");
         }
-      ];
+      })
+      .then((responseData) =>{
+            comments = responseData.comments.map((comment) => {
+              return {
+                name: comment.author.name,
+                date: new Date().toLocaleString(), 
+                text: comment.text,
+                likes: comment.likes,
+                isLiked: false,
+              };
+            })
+            renderComments();
+          })
+      .catch((error) => {
+        alert('Кажется, у вас сломался интернет, попробуйте позже');
+      })
+      }
+      
+      const initLikeButton = () => {
+        const likeButtonElements = document.querySelectorAll('.like-button');
+        for (let likeButtonElement of likeButtonElements) {
+          likeButtonElement.addEventListener('click', (event) => {
+            const index = likeButtonElement.dataset.index;
+            comments[index].like += comments[index].iLike ? -1 : +1;
+            comments[index].iLike = !comments[index].iLike;
+            event.stopPropagation();
+            renderComments();
+          })
+        }
+      }
+
+      //ответ на комментарий
+      const answerComment = () => {
+      const boxOfComment = document.querySelectorAll('.comment');
+      for (const commentEl of boxOfComment) {
+        commentEl.addEventListener('click', () => {
+          const index = commentEl .dataset.index;
+          const textComment = document.querySelector('.add-form-text');
+          textComment.value = `>>${comments[index].text}\n ${comments[index].name}, `;
+
+          renderComments();
+        })
+      }
+      }
 
       const renderComments =  () => {
-        const commentsHtml = comments.map((comments) => {
-          return `<li class="comment">
+        let commentsHtml = comments.map((comment, index) => {
+          return `<li class="comment" data-index="${index}">
           <div class="comment-header">
-            <div>${comments.name}</div>
-            <div>${comments.date}</div>
+            <div class="comment-name">${comment.name}</div>
+            <div>${comment.date}</div>
           </div>
           <div class="comment-body">
-            <div class="comment-text">${comments.comment}</div>
+            <div class="comment-text">${comment.text}</div>
           </div>
           <div class="comment-footer">
             <div class="likes">
-              <span class="likes-counter">${comments.like}</span>
-              <button class="like-button">${comments.iLike}</button>
+              <span class="likes-counter">${comment.likes}</span>
+              <button data-index='${index}' class="like-button ${comment.iLike ? '-active-like' : ''}"></button>
             </div>
           </div>
         </li>`
         }).join('');
-
+        
         commentElement.innerHTML = commentsHtml;
+        initLikeButton();
+        answerComment();
       }
+      fetchAndRenderComments();
+      renderComments()
 
       //добавление комментария
       addButton.addEventListener('click', () => {
-        const oldCommentHtml = commentElement.innerHTML; 
-        commentElement.innerHTML = oldCommentHtml + 
-        `<li class="comment">
-          <div class="comment-header">
-            <div>${userName.value}</div>
-            <div>${formattedDate}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">${userComment.value}</div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">0</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>`
+        addButton.disabled = true;
+        addButton.textContent = 'Комментарий добавляется';
+        const newComment = document.querySelector('.comment');
+        
+        fetch("https://wedev-api.sky.pro/api/v1/maria-derre/comments",
+        {
+          method: "POST",
+          body: JSON.stringify({
+              name: userName.value
+                .replaceAll("<", '&lt')
+                .replaceAll(">", '&gt'),
+              text: userComment.value
+                .replaceAll("<", '&lt')
+                .replaceAll(">", '&gt'),
+          })  
+      })
+      .then((response) => {
+        return response;
+      })
+      .then((response) => { //хранится информация об ответе пост запроса
+        if (response.status === 201) {
+          return response.json()
+        } else if (response.status === 400) {
+          alert("Имя и комментарий должны быть не короче 3 символов");
+          newComment.style.display = block;
+        }  else if (response.status === 500) {
+          alert ("Сервер сломался, попробуй позже");
+          newComment.style.display = block;
+        }
+      }).then(() => {
+          return fetchAndRenderComments();
+      })
+      .then(() => {
+        addButton.disabled = false;
+        addButton.textContent = 'Написать'
         userComment.value = '';
         userName.value = '';
+      })
+      .catch((error) => {
+        addButton.disabled = false;
+        addButton.textContent = 'Написать'
+        alert('Кажется, у вас сломался интернет, попробуйте позже');
+        console.warn(error);
+        newComment.style.display = block;
+      })
+        renderComments();
       });
 
       //валидация полей имя и комментарий
@@ -139,26 +212,31 @@
       }}
       prov();
 
-        userComment.addEventListener('input', function () {
-          if (userName.value === '' || userComment.value === '') {
-            addButton.disabled = true;
-          } else {
+      userComment.addEventListener('input', function () {
+        if (userName.value === '' || userComment.value === '') {
+          addButton.disabled = true;
+        } else {
             addButton.disabled = false;
           }
-        })
-        userName.addEventListener('input', function () {
-          if (userName.value === '' || userComment.value === '') {
-            addButton.disabled = true;
-          } else {
-            addButton.disabled = false;
-          };
-        });
+      })
+      userName.addEventListener('input', function () {
+        if (userName.value === '' || userComment.value === '') {
+          addButton.disabled = true;
+        } else {
+          addButton.disabled = false;
+        };
+      });
 
         //дата
         const currentDate = new Date();
         const optionsDate = { year: 'numeric', month: 'numeric', day: 'numeric' };
-        const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        const optionsTime = { hour: '2-digit', minute: '2-digit'};
         const formattedDate = currentDate.toLocaleDateString('ru-RU', optionsDate) + ' ' + currentDate.toLocaleTimeString('ru-RU', optionsTime);
-        
+
+        //лоудер
+        window.addEventListener('load', function () {
+        let preloader = document.getElementById('preloader');
+        preloader.style.display = 'none';
+        });
   </script>
 </html>
