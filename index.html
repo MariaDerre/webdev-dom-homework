@@ -5,8 +5,10 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-
   <body>
+    <div id="preloader">
+      <div class="spinner"></div>
+    </div>
     <div class="container">
       <ul class="comments">
         <li class="comment">
@@ -72,13 +74,18 @@
 
       let comments = [];
 
+      const fetchAndRenderComments = () => {
       fetch('https://wedev-api.sky.pro/api/v1/maria-derre/comments', 
       {
         method: 'GET'
       }).then((response) => {
-          response.json().then((responseData) =>{
-            console.log(responseData);
-
+        if (response.status === 200) {
+          return response.json()
+        } else if (response.status === 500){
+          alert ("Сервер сломался, попробуй позже");
+        }
+      })
+      .then((responseData) =>{
             comments = responseData.comments.map((comment) => {
               return {
                 name: comment.author.name,
@@ -89,13 +96,16 @@
               };
             })
             renderComments();
-          }) 
+          })
+      .catch((error) => {
+        alert('Кажется, у вас сломался интернет, попробуйте позже');
       })
-
+      }
+      
       const initLikeButton = () => {
         const likeButtonElements = document.querySelectorAll('.like-button');
         for (let likeButtonElement of likeButtonElements) {
-          likeButtonElement.addEventListener('click', (event) =>{
+          likeButtonElement.addEventListener('click', (event) => {
             const index = likeButtonElement.dataset.index;
             comments[index].like += comments[index].iLike ? -1 : +1;
             comments[index].iLike = !comments[index].iLike;
@@ -108,12 +118,11 @@
       //ответ на комментарий
       const answerComment = () => {
       const boxOfComment = document.querySelectorAll('.comment');
-      for (const comment of boxOfComment) {
-        comment.addEventListener('click', () => {
-          const userName = document.querySelector('.comment-name').textContent;
-          const userComment = document.querySelector('.comment-body').textContent;
+      for (const commentEl of boxOfComment) {
+        commentEl.addEventListener('click', () => {
+          const index = commentEl .dataset.index;
           const textComment = document.querySelector('.add-form-text');
-          textComment.value = `>>${userComment}${userName}`;
+          textComment.value = `>>${comments[index].text}\n ${comments[index].name}, `;
 
           renderComments();
         })
@@ -122,7 +131,7 @@
 
       const renderComments =  () => {
         let commentsHtml = comments.map((comment, index) => {
-          return `<li class="comment">
+          return `<li class="comment" data-index="${index}">
           <div class="comment-header">
             <div class="comment-name">${comment.name}</div>
             <div>${comment.date}</div>
@@ -143,10 +152,15 @@
         initLikeButton();
         answerComment();
       }
+      fetchAndRenderComments();
       renderComments()
 
       //добавление комментария
       addButton.addEventListener('click', () => {
+        addButton.disabled = true;
+        addButton.textContent = 'Комментарий добавляется';
+        const newComment = document.querySelector('.comment');
+        
         fetch("https://wedev-api.sky.pro/api/v1/maria-derre/comments",
         {
           method: "POST",
@@ -157,17 +171,38 @@
               text: userComment.value
                 .replaceAll("<", '&lt')
                 .replaceAll(">", '&gt'),
-          })
-        }).then((response) => {
-          response.json().then((responseData) => {
-            comments = responseData.comment; 
-            renderComments();
-          })
-        })
-
-        renderComments();
+          })  
+      })
+      .then((response) => {
+        return response;
+      })
+      .then((response) => { //хранится информация об ответе пост запроса
+        if (response.status === 201) {
+          return response.json()
+        } else if (response.status === 400) {
+          alert("Имя и комментарий должны быть не короче 3 символов");
+          newComment.style.display = block;
+        }  else if (response.status === 500) {
+          alert ("Сервер сломался, попробуй позже");
+          newComment.style.display = block;
+        }
+      }).then(() => {
+          return fetchAndRenderComments();
+      })
+      .then(() => {
+        addButton.disabled = false;
+        addButton.textContent = 'Написать'
         userComment.value = '';
         userName.value = '';
+      })
+      .catch((error) => {
+        addButton.disabled = false;
+        addButton.textContent = 'Написать'
+        alert('Кажется, у вас сломался интернет, попробуйте позже');
+        console.warn(error);
+        newComment.style.display = block;
+      })
+        renderComments();
       });
 
       //валидация полей имя и комментарий
@@ -197,6 +232,11 @@
         const optionsDate = { year: 'numeric', month: 'numeric', day: 'numeric' };
         const optionsTime = { hour: '2-digit', minute: '2-digit'};
         const formattedDate = currentDate.toLocaleDateString('ru-RU', optionsDate) + ' ' + currentDate.toLocaleTimeString('ru-RU', optionsTime);
-        
+
+        //лоудер
+        window.addEventListener('load', function () {
+        let preloader = document.getElementById('preloader');
+        preloader.style.display = 'none';
+        });
   </script>
 </html>
