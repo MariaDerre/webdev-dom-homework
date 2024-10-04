@@ -1,6 +1,6 @@
 import { comments } from "./main.js";
 import { initLikeButton } from "./main.js";
-import { answerComment } from "./main.js";
+import { answerComment } from "./main.js"; 
 
 const commentElement = document.querySelector('.comments');
 
