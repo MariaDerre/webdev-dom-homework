@@ -24,7 +24,7 @@ const addButton = document.querySelector('.add-form-button');
       })
     }
   }
-
+  
   //ответ на комментарий
   export const answerComment = () => {
   const boxOfComment = document.querySelectorAll('.comment');
