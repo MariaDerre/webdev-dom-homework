@@ -6,7 +6,17 @@ const userName = document.querySelector('.add-form-name');
 const userComment = document.querySelector('.add-form-text');
 const addButton = document.querySelector('.add-form-button');
 
-  export let comments = [];
+export let comments = [];
+export function replaceComments(data){
+comments = data.comments.map((comment) => {
+        return {
+          name: comment.author.name,
+          date: new Date().toLocaleString(),
+          text: comment.text,
+          likes: comment.likes,
+          isLiked: false,
+        };
+})}
 
   export const initLikeButton = () => {
     const likeButtonElements = document.querySelectorAll('.like-button');
@@ -24,7 +34,7 @@ const addButton = document.querySelector('.add-form-button');
       })
     }
   }
-  
+
   //ответ на комментарий
   export const answerComment = () => {
   const boxOfComment = document.querySelectorAll('.comment');
@@ -46,7 +56,6 @@ const addButton = document.querySelector('.add-form-button');
   addButton.addEventListener('click', () => {
     addButton.disabled = true;
     addButton.textContent = 'Комментарий добавляется';
-    const newComment = document.querySelector('.comment');
     postApi();
     
     renderComments();
