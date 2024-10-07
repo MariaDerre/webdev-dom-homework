@@ -7,16 +7,23 @@ const userComment = document.querySelector('.add-form-text');
 const addButton = document.querySelector('.add-form-button');
 
 export let comments = [];
-export function replaceComments(data){
-comments = data.comments.map((comment) => {
-        return {
-          name: comment.author.name,
-          date: new Date().toLocaleString(),
-          text: comment.text,
-          likes: comment.likes,
-          isLiked: false,
-        };
-})}
+
+fetchAndRenderComments().then((responseData) => {
+  comments = responseData.comments.map(comment => {
+    return {
+      name: comment.author.name,
+      date: new Date().toLocaleString(),
+      text: comment.text,
+      likes: comment.likes,
+      isLiked: false,
+    };
+  })
+   renderComments(comments);
+})  
+.catch((error) => {
+  console.error(error)
+  throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
+})
 
   export const initLikeButton = () => {
     const likeButtonElements = document.querySelectorAll('.like-button');

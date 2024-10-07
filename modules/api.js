@@ -1,5 +1,4 @@
 import { renderComments } from "./render.js";
-import { replaceComments } from "./main.js";
 
 const userName = document.querySelector('.add-form-name');
 const userComment = document.querySelector('.add-form-text');
@@ -7,7 +6,7 @@ const addButton = document.querySelector('.add-form-button');
 const newComment = document.querySelector('.comment');
 
 const fetchAndRenderComments = () => {
-    fetch('https://wedev-api.sky.pro/api/v1/maria-derre/comments', 
+    return fetch('https://wedev-api.sky.pro/api/v1/maria-derre/comments', 
     {
       method: 'GET'
     }).then((response) => {
@@ -19,14 +18,7 @@ const fetchAndRenderComments = () => {
         throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
       }
     })
-    .then(() => {
-        replaceComments()
-        return renderComments();
-        })
-    .catch((error) => {
-      console.error (error.message)
-    })
-    }
+  }
 
     const postApi = () => {
         fetch("https://wedev-api.sky.pro/api/v1/maria-derre/comments",
