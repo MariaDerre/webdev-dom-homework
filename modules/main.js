@@ -1,10 +1,10 @@
-"use strict";
+
 import {fetchAndRenderComments, postApi} from "./api.js"
 import {renderComments} from './render.js'
 
-const userName = document.querySelector('.add-form-name');
-const userComment = document.querySelector('.add-form-text');
-const addButton = document.querySelector('.add-form-button');
+export const userName = document.querySelector('.add-form-name');
+export const userComment = document.querySelector('.add-form-text');
+export const addButton = document.querySelector('.add-form-button');
 
 export let comments = [];
 
@@ -63,8 +63,26 @@ fetchAndRenderComments().then((responseData) => {
   addButton.addEventListener('click', () => {
     addButton.disabled = true;
     addButton.textContent = 'Комментарий добавляется';
-    postApi();
-    
+    postApi().then(() => {
+      return postApi()})
+    .then(() => {
+      return fetchAndRenderComments().then((responseData) => {
+        comments = responseData.comments.map(comment => {
+          return {
+            name: comment.author.name,
+            date: new Date().toLocaleString(),
+            text: comment.text,
+            likes: comment.likes,
+            isLiked: false,
+          };
+        })
+         renderComments(comments);
+      })  
+      .catch((error) => {
+        console.error(error)
+        throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
+      })
+    })
     renderComments();
   });
 
@@ -101,3 +119,21 @@ fetchAndRenderComments().then((responseData) => {
     let preloader = document.getElementById('preloader');
     preloader.style.display = 'none';
     });
+
+    // postApi().then(() => {
+    //   return postApi()
+    // }).then((responseData) => {
+    //   comments = responseData.comments.map(comment => {
+    //   return {
+    //     name: comment.author.name,
+    //     date: new Date().toLocaleString(),
+    //     text: comment.text,
+    //     likes: comment.likes,
+    //     isLiked: false,
+    //   };
+    // })
+    // renderComments(comments)
+    // }).catch((error) => {
+    //   console.error(error)
+    //   throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
+    // })

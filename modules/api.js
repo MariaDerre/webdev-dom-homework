@@ -1,8 +1,6 @@
 import { renderComments } from "./render.js";
+import { userComment, userName, addButton } from "./main.js";
 
-const userName = document.querySelector('.add-form-name');
-const userComment = document.querySelector('.add-form-text');
-const addButton = document.querySelector('.add-form-button');
 const newComment = document.querySelector('.comment');
 
 const fetchAndRenderComments = () => {
@@ -21,7 +19,7 @@ const fetchAndRenderComments = () => {
   }
 
     const postApi = () => {
-        fetch("https://wedev-api.sky.pro/api/v1/maria-derre/comments",
+        return fetch("https://wedev-api.sky.pro/api/v1/maria-derre/comments",
         {
           method: "POST",
           body: JSON.stringify({
