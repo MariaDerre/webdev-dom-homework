@@ -63,9 +63,8 @@ fetchAndRenderComments().then((responseData) => {
   addButton.addEventListener('click', () => {
     addButton.disabled = true;
     addButton.textContent = 'Комментарий добавляется';
+
     postApi().then(() => {
-      return postApi()})
-    .then(() => {
       return fetchAndRenderComments().then((responseData) => {
         comments = responseData.comments.map(comment => {
           return {
@@ -119,21 +118,3 @@ fetchAndRenderComments().then((responseData) => {
     let preloader = document.getElementById('preloader');
     preloader.style.display = 'none';
     });
-
-    // postApi().then(() => {
-    //   return postApi()
-    // }).then((responseData) => {
-    //   comments = responseData.comments.map(comment => {
-    //   return {
-    //     name: comment.author.name,
-    //     date: new Date().toLocaleString(),
-    //     text: comment.text,
-    //     likes: comment.likes,
-    //     isLiked: false,
-    //   };
-    // })
-    // renderComments(comments)
-    // }).catch((error) => {
-    //   console.error(error)
-    //   throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
-    // })
