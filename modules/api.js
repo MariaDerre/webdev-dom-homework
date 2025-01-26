@@ -1,12 +1,16 @@
-import { renderComments } from "./render.js";
-import { userComment, userName, addButton } from "./main.js";
+import { userComment, userName } from "./main.js";
 
 const newComment = document.querySelector('.comment');
+const host = 'https://wedev-api.sky.pro/api/v2/maria-derre/comments'
+export let token = "Bearer asb4c4boc86gasb4c4bokc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4"
 
 const fetchAndRenderComments = () => {
-    return fetch('https://wedev-api.sky.pro/api/v1/maria-derre/comments', 
+    return fetch(host, 
     {
-      method: 'GET'
+      method: 'GET',
+      headers: {
+        Authorization: token,
+      }
     }).then((response) => {
       if (response.status === 200) {
         return response.json()
@@ -14,14 +18,19 @@ const fetchAndRenderComments = () => {
         throw new Error ("Сервер сломался, попробуй позже");
       } else if(error instanceof TypeError || error.name === "NetworkError") {
         throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
+      } else if (response.status === 401) {
+        throw new Error ('Нет авторизации')
       }
     })
   }
 
     const postApi = () => {
-        return fetch("https://wedev-api.sky.pro/api/v1/maria-derre/comments",
+        return fetch(host,
         {
           method: "POST",
+          headers: {
+            Authorization: token,
+          },
           body: JSON.stringify({
               name: userName.value
                 .replaceAll("<", '&lt')
