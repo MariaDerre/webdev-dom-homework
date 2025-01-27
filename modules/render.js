@@ -1,8 +1,10 @@
 import { comments, initLikeButton, answerComment } from "./main.js";
-import {token} from "./api.js"
+import {token, postApi} from "./api.js"
 
 const commentElement = document.querySelector('.comments');
-const addButton = document.querySelector('.add-form-button');
+
+const userName = document.querySelector('.add-form-name');
+const userComment = document.querySelector('.add-form-text');
 
 const renderComments = () => {
   const appEl = document.querySelector('.app')
@@ -65,11 +67,61 @@ const renderComments = () => {
   
     appEl.innerHTML = appHtml;
 
+  
+    //добавление комментария
+    const addButton = document.querySelector('.add-form-button');
+    addButton.addEventListener('click', () => {
+    addButton.disabled = true;
+    addButton.textContent = 'Комментарий добавляется';
+    
+      postApi().then(() => {
+        return fetchAndRenderComments().then((responseData) => {
+          comments = responseData.comments.map(comment => {
+            return {
+              name: comment.author.name,
+              date: new Date().toLocaleString(),
+              text: comment.text,
+              likes: comment.likes,
+              isLiked: false,
+            };
+          })
+            renderComments(comments);
+          })  
+          .catch((error) => {
+            console.error(error)
+            throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
+          })
+        })
+        renderComments();
+      });
+ 
+
+  //валидация полей имя и комментарий
+  function prov() {
+    if (userName.value === '' && userComment.value === '') {
+    addButton.disabled = true;
+  }}
+  prov();
+
+  userComment.addEventListener('input', function () {
+    if (userName.value === '' || userComment.value === '') {
+      addButton.disabled = true;
+    } else {
+        addButton.disabled = false;
+      }
+  })
+  userName.addEventListener('input', function () {
+    if (userName.value === '' || userComment.value === '') {
+      addButton.disabled = true;
+    } else {
+      addButton.disabled = false;
+    };
+  });
+
     initLikeButton();
     answerComment();
   }
 
-  export {renderComments}
+  export {renderComments, userComment, userName}
 
-//в этом файле все ок. остановилась на 7 видео.
   

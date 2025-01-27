@@ -1,4 +1,4 @@
-import { userComment, userName } from "./main.js";
+import { userComment, userName } from "./render.js";
 
 const newComment = document.querySelector('.comment');
 const host = 'https://wedev-api.sky.pro/api/v2/maria-derre/comments'

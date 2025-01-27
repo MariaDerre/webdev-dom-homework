@@ -1,5 +1,5 @@
 
-import {fetchAndRenderComments, postApi} from "./api.js"
+import {fetchAndRenderComments} from "./api.js"
 import {renderComments} from './render.js'
 
  export let comments = [];
@@ -55,58 +55,6 @@ fetchAndRenderComments().then((responseData) => {
 
   fetchAndRenderComments();
   renderComments()
-
-        //добавление комментария
-    const addButton = document.querySelector('.add-form-button');
-    addButton.addEventListener('click', () => {
-    addButton.disabled = true;
-    addButton.textContent = 'Комментарий добавляется';
-    
-      postApi().then(() => {
-        return fetchAndRenderComments().then((responseData) => {
-          comments = responseData.comments.map(comment => {
-            return {
-              name: comment.author.name,
-              date: new Date().toLocaleString(),
-              text: comment.text,
-              likes: comment.likes,
-              isLiked: false,
-            };
-          })
-            renderComments(comments);
-          })  
-          .catch((error) => {
-            console.error(error)
-            throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
-          })
-        })
-        renderComments();
-      });
-
-  export const userName = document.querySelector('.add-form-name');
-  export const userComment = document.querySelector('.add-form-text');
-
-  //валидация полей имя и комментарий
-  function prov() {
-    if (userName.value === '' && userComment.value === '') {
-    addButton.disabled = true;
-  }}
-  prov();
-
-  userComment.addEventListener('input', function () {
-    if (userName.value === '' || userComment.value === '') {
-      addButton.disabled = true;
-    } else {
-        addButton.disabled = false;
-      }
-  })
-  userName.addEventListener('input', function () {
-    if (userName.value === '' || userComment.value === '') {
-      addButton.disabled = true;
-    } else {
-      addButton.disabled = false;
-    };
-  });
 
     //дата
     const currentDate = new Date();
