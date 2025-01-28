@@ -1,7 +1,5 @@
 import { comments, initLikeButton, answerComment } from "./main.js";
-import {token, postApi} from "./api.js"
-
-const commentElement = document.querySelector('.comments');
+import {token, postApi, fetchAndRenderComments} from "./api.js"
 
 const userName = document.querySelector('.add-form-name');
 const userComment = document.querySelector('.add-form-text');
@@ -24,7 +22,17 @@ const renderComments = () => {
             <a class="link-login" href="#">Зарегистироваться</a>
           </div>
       </div>`
-  }
+
+  appEl.innerHTML = appHtml;
+
+  document.querySelectorAll('.login-button').addEventListener("click", () => {
+    token = "Bearer asb4c4boc86gasb4c4bokc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4"
+
+    fetchAndRenderComments()
+  })
+
+  return;
+}
 
   let commentsHtml = comments.map((comment, index) => {
     return `<li class="comment" data-index="${index}">
@@ -45,7 +53,7 @@ const renderComments = () => {
   }).join('');
 
   const appHtml = 
-  `
+  `<div class="container">
     ${commentsHtml}
   <div class="add-form">
         <input
@@ -62,11 +70,10 @@ const renderComments = () => {
         <div class="add-form-row">
           <button class="add-form-button">Написать</button>
         </div>
-    </div>
+  </div>
   </div>`
-  
-    appEl.innerHTML = appHtml;
 
+  appEl.innerHTML = appHtml;
   
     //добавление комментария
     const addButton = document.querySelector('.add-form-button');
@@ -95,7 +102,6 @@ const renderComments = () => {
         renderComments();
       });
  
-
   //валидация полей имя и комментарий
   function prov() {
     if (userName.value === '' && userComment.value === '') {
