@@ -20,23 +20,6 @@ fetchAndRenderComments().then((responseData) => {
   throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
 })
 
-export const initLikeButton = () => {
-  const likeButtonElements = document.querySelectorAll('.like-button');
-  for (let likeButtonElement of likeButtonElements) {
-    likeButtonElement.addEventListener('click', (event) => {
-      const index = likeButtonElement.dataset.index;
-      comments[index].isLiked = !comments[index].isLiked;
-      if (comments[index].isLiked) {
-        comments[index].likes++
-      } else {
-        comments[index].likes--
-      }
-      event.stopPropagation();
-      renderComments();
-    })
-  }
-}
-
 //ответ на комментарий
 export const answerComment = () => {
 const boxOfComment = document.querySelectorAll('.comment');

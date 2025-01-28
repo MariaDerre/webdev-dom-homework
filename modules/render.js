@@ -1,35 +1,15 @@
-import { comments, initLikeButton, answerComment } from "./main.js";
+import { comments } from "./main.js";
 import {token, postApi, fetchAndRenderComments} from "./api.js"
-
-const userName = document.querySelector('.add-form-name');
-const userComment = document.querySelector('.add-form-text');
+import { renderLoginComponent } from "../components/login-components.js";
 
 const renderComments = () => {
   const appEl = document.querySelector('.app')
   if (!token) {
-    const appHtml = 
-    `   
-    <div class="container">   
-      <div class="login-form">
-          <div class="input-text">
-              <input type="text" class="login-input"/>
-              <input type="password" class="password-input">
-          </div>
-          <div class="add-form-row">
-            <button class="login-button">Войти</button>
-          </div>
-          <div class="register">
-            <a class="link-login" href="#">Зарегистироваться</a>
-          </div>
-      </div>`
-
-  appEl.innerHTML = appHtml;
-
-  document.querySelectorAll('.login-button').addEventListener("click", () => {
-    token = "Bearer asb4c4boc86gasb4c4bokc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4"
-
-    fetchAndRenderComments()
-  })
+    renderLoginComponent({
+    appEl, 
+    setToken: (newToken) => {
+    token = newToken;
+  }})
 
   return;
 }
@@ -101,7 +81,8 @@ const renderComments = () => {
         })
         renderComments();
       });
- 
+      const userName = document.querySelector('.add-form-name');
+      const userComment = document.querySelector('.add-form-text');
   //валидация полей имя и комментарий
   function prov() {
     if (userName.value === '' && userComment.value === '') {
@@ -124,10 +105,45 @@ const renderComments = () => {
     };
   });
 
+const initLikeButton = () => {
+  const likeButtonElements = document.querySelectorAll('.like-button');
+  for (let likeButtonElement of likeButtonElements) {
+    likeButtonElement.addEventListener('click', (event) => {
+      const index = likeButtonElement.dataset.index;
+      comments[index].isLiked = !comments[index].isLiked;
+      if (comments[index].isLiked) {
+        comments[index].likes++
+      } else {
+        comments[index].likes--
+      }
+      event.stopPropagation();
+      renderComments();
+    })
+  }
+}
+
+//ответ на комментарий
+const answerComment = () => {
+const boxOfComment = document.querySelectorAll('.comment');
+for (const commentEl of boxOfComment) {
+  commentEl.addEventListener('click', () => {
+    const index = commentEl .dataset.index;
+    const textComment = document.querySelector('.add-form-text');
+    textComment.value = `>>${comments[index].text}\n ${comments[index].name}, `;
+
+    renderComments();
+  })
+}
+}
+
+fetchAndRenderComments();
+document.addEventListener('DOMContentLoaded', () => {
+  renderComments();
+});
+
+
     initLikeButton();
     answerComment();
   }
 
-  export {renderComments, userComment, userName}
-
-  
+  export {renderComments}
