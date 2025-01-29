@@ -1,3 +1,5 @@
+import { login } from "../modules/api-login.js";
+
 export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments}) {
     const appHtml = 
     `   
@@ -17,8 +19,15 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
 
     appEl.innerHTML = appHtml;
 
-    document.querySelectorAll('.login-button').addEventListener("click", () => {
-    setToken("Bearer asb4c4boc86gasb4c4bokc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4")
-    fetchAndRenderComments()
+    document.querySelector('.login-button').addEventListener("click", () => {
+
+    login({
+        login: 'admin',
+        password: 'admin'
+    }).then((user) => {
+        console.log(user)
+        setToken(`Bearer ${user.user.token}`);
+        fetchAndRenderComments()
+    })
   })
 }
