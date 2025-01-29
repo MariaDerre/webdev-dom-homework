@@ -1,20 +1,23 @@
-import { login } from "../modules/api-login.js";
-
+import { loginUser, registerUser } from "../modules/api-login.js";
 
 export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments}) {
+  let isLoginMode = true; //если тру, то форма входа
+
+  const renderForm = () => {
     const appHtml = 
     `   
     <div class="container">   
       <div class="login-form">
           <div class="input-text">
-              <input type="text" class="login-input"/>
-              <input type="password" class="password-input">
+              ${isLoginMode ? "" : `<input type="text" class="name-input" placeholder='Имя'/>`}
+              <input type="text" class="login-input" placeholder='Логин'/>
+              <input type="password" class="password-input" placeholder='Пароль'>
           </div>
           <div class="add-form-row">
-            <button class="login-button">Войти</button>
+            <button class="login-button">${isLoginMode ? "Войти" : "Зарегистрироваться"}</button>
           </div>
           <div class="register">
-            <a class="link-login" href="#">Зарегистироваться</a>
+            <a class="toggle-button" href="#">${isLoginMode ? "Зарегистрироваться" : "Перейти к авторизации"}</a>
           </div>
       </div>`
 
@@ -22,24 +25,59 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
 
     document.querySelector('.login-button').addEventListener("click", () => {
 
-    login({
-        login: 'admin',
-        password: 'admin'
-    }).then((response) => {
-      if(response.status === 400){
-        throw new Error("Такой логин и пароль  не существует")
+      if(isLoginMode) {
+        const login = document.querySelector('.login-input').value
+        const password = document.querySelector('.password-input').value
+
+        loginUser({
+            login: login,
+            password: password,
+        }).then((response) => {
+          if(response.status === 400){
+            throw new Error("Неверны логин или пароль")
+          }
+          if(response.status === 500){
+            throw new Error("Сервер упал");
+          }
+          return response.json();
+        }) 
+        .then((user) => {
+            setToken(`Bearer ${user.user.token}`);
+            return fetchAndRenderComments()
+        }).catch((error) => {
+          console.error(error); 
+      });
+      } else {
+        const login = document.querySelector('.login-input').value
+        const password = document.querySelector('.password-input').value
+        const name = document.querySelector('.name-input').valueж
+        registerUser({
+          login: login,
+          password: password,
+          name: name
+      }).then((response) => {
+        if(response.status === 400){
+          throw new Error("Неверны логин или пароль")
+        }
+        if(response.status === 500){
+          throw new Error("Сервер упал");
+        }
+        return response.json();
+      }) 
+      .then((user) => {
+          setToken(`Bearer ${user.user.token}`);
+          return fetchAndRenderComments()
+      }).catch((error) => {
+        console.error(error); 
+    });
       }
-      if(response.status === 500){
-        throw new Error("Сервер упал");
-      }
-      return response.json();
-    }) 
-    .then((user) => {
-        setToken(user.user.token);
-        console.log(user)
-        fetchAndRenderComments()
-    }).catch((error) => {
-      console.error(error); 
-  });
+      })
+    
+
+  document.querySelector('.toggle-button').addEventListener("click", () =>{
+    isLoginMode = !isLoginMode;
+    renderForm();
   })
+  }
+renderForm()
 }

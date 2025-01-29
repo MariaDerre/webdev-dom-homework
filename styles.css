@@ -168,7 +168,8 @@ body {
   }
 
   .login-input,
-  .password-input {
+  .password-input,
+  .name-input {
     font-size: 16px;
     font-family: Helvetica;
     border-radius: 8px;
@@ -213,7 +214,7 @@ body {
   .login-button:hover {
     opacity: 0.9;
   }
-  .link-login{
+  .toggle-button{
     font-size: 16px;
     font-family: Helvetica;
     color:#ffffff;
