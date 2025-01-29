@@ -17,7 +17,7 @@ const renderComments = () => {
   let commentsHtml = comments.map((comment, index) => {
     return `<li class="comment" data-index="${index}">
     <div class="comment-header">
-      <div class="comment-name">${comment.name}</div>
+      <div class="comment-name">${comment.user?.name ?? "Неизвестно"}</div>
       <div>${comment.date}</div>
     </div>
     <div class="comment-body">
@@ -31,6 +31,7 @@ const renderComments = () => {
     </div>
   </li>`
   }).join('');
+  
 
   const appHtml = 
   `<div class="container">

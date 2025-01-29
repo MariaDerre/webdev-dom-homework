@@ -1,4 +1,5 @@
 import { login } from "../modules/api-login.js";
+import { comments } from "../modules/main.js";
 
 export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments}) {
     const appHtml = 
@@ -25,7 +26,8 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
         login: 'admin',
         password: 'admin'
     }).then((user) => {
-        console.log(user)
+      const keys = Object.keys(user);
+      console.log(keys);
         setToken(`Bearer ${user.user.token}`);
         fetchAndRenderComments()
     })
