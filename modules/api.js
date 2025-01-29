@@ -1,8 +1,12 @@
 export const host = 'https://wedev-api.sky.pro/api/v2/maria-derre/comments'
 export let token = "Bearer asb4c4boc86gasb4c4bokc86g37w3cc3bo3b83k4g37k3bk3cg3c03ck4"
+// token = null;
 
-// token=null;
+export const setToken = (newToken) => {
+  token = newToken
+};
 
+//запрос для получения комментариев
 const fetchAndRenderComments = () => {
     return fetch(host, 
     {
@@ -15,14 +19,19 @@ const fetchAndRenderComments = () => {
         return response.json()
       } else if (response.status === 500){
         throw new Error ("Сервер сломался, попробуй позже");
-      } else if(error instanceof TypeError || error.name === "NetworkError") {
-        throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
       } else if (response.status === 401) {
         throw new Error ('Нет авторизации')
       }
-    })
+    }).catch((error) => {
+      if (error instanceof TypeError || error.name === "NetworkError") {
+          console.error('Кажется, у вас сломался интернет, попробуйте позже');
+      } else {
+          console.error(error.message);
+      }
+  });
   }
 
+//запрос на сервер для добавления нового комментария
 const postApi = () => {
   
 const userName = document.querySelector('.add-form-name');
@@ -34,7 +43,7 @@ const newComment = document.querySelector('.comment');
     {
       method: "POST",
       headers: {
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
           name: userName.value
@@ -52,13 +61,11 @@ const newComment = document.querySelector('.comment');
     if (response.status === 201) {
       return response.json()
     } else if (response.status === 400) {
+      newComment.style.display = 'block';
       throw new Error("Имя и комментарий должны быть не короче 3 символов");
-      newComment.style.display = 'block';
     }  else if (response.status === 500) {
-      throw new Error ("Сервер сломался, попробуй позже");
       newComment.style.display = 'block';
-    } else if (error instanceof TypeError || error.name === "NetworkError") {
-      throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
+      throw new Error ("Сервер сломался, попробуй позже");
     }
   }).then(() => {
       return fetchAndRenderComments();
@@ -74,8 +81,11 @@ const newComment = document.querySelector('.comment');
     addButton.textContent = 'Написать'
     alert (error.message)
     newComment.style.display = 'block';
+    if (error instanceof TypeError || error.name === "NetworkError") {
+      throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
+    }
   })
 }
 
-    export {fetchAndRenderComments, postApi}
+export {fetchAndRenderComments, postApi}
     

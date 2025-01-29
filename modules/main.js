@@ -13,6 +13,7 @@ export function replaceComments(data){
           };
   })}
 
+//получение и отображение комментариев с апи
 fetchAndRenderComments().then((responseData) => {
   comments = responseData.comments.map(comment => {
     return {

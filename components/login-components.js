@@ -1,5 +1,5 @@
 import { login } from "../modules/api-login.js";
-import { comments } from "../modules/main.js";
+
 
 export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments}) {
     const appHtml = 
@@ -25,11 +25,21 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
     login({
         login: 'admin',
         password: 'admin'
-    }).then((user) => {
-      const keys = Object.keys(user);
-      console.log(keys);
-        setToken(`Bearer ${user.user.token}`);
+    }).then((response) => {
+      if(response.status === 400){
+        throw new Error("Такой логин и пароль  не существует")
+      }
+      if(response.status === 500){
+        throw new Error("Сервер упал");
+      }
+      return response.json();
+    }) 
+    .then((user) => {
+        setToken(user.user.token);
+        console.log(user)
         fetchAndRenderComments()
-    })
+    }).catch((error) => {
+      console.error(error); 
+  });
   })
 }

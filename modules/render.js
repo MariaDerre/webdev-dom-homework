@@ -1,5 +1,5 @@
 import { answerComment, comments, initLikeButton, replaceComments } from "./main.js";
-import {token, postApi, fetchAndRenderComments} from "./api.js"
+import {token, postApi, fetchAndRenderComments, setToken} from "./api.js"
 import { renderLoginComponent } from "../components/login-components.js";
 
 const renderComments = () => {
@@ -7,9 +7,9 @@ const renderComments = () => {
   if (!token) {
     renderLoginComponent({
     appEl, 
-    setToken: (newToken) => {
-    token = newToken;
-  }})
+    setToken,
+    fetchAndRenderComments,
+  })
 
   return;
 }
@@ -36,7 +36,8 @@ const renderComments = () => {
   const appHtml = 
   `<div class="container">
     ${commentsHtml}
-  <div class="add-form">
+  ${token ?
+    `<div class="add-form">
         <input
           type="text"
           class="add-form-name"
@@ -51,9 +52,14 @@ const renderComments = () => {
         <div class="add-form-row">
           <button class="add-form-button">Написать</button>
         </div>
-  </div>
+      </div>
+    </div>`
+    :
+    `<div class = "form-loading" style="margin-top: 20px">
+    Что бы добавить комментарий, <a href='#' id="go-to-login" href='#'>авторизуйтесь</a>
+      </div> `
+  }
   </div>`
-
   appEl.innerHTML = appHtml;
   
     //добавление комментария
@@ -64,17 +70,15 @@ const renderComments = () => {
     addButton.textContent = 'Комментарий добавляется';
     
       postApi().then(() => {
-        return fetchAndRenderComments().then((responseData) => {
-          replaceComments(responseData); // Передаём responseData в replaceComments
-      
-          renderComments(comments);
+        return fetchAndRenderComments().then((responseData) => { //получаем обновленные комментарии
+          replaceComments(responseData); // обновляем комментарии
+          renderComments(responseData); // отображаем комментарии
           })  
           .catch((error) => {
             console.error(error)
             throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
           })
         })
-        renderComments();
       });
       
   const userName = document.querySelector('.add-form-name');
