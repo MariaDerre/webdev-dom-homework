@@ -32,15 +32,7 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
         loginUser({
             login: login,
             password: password,
-        }).then((response) => {
-          if(response.status === 400){
-            throw new Error("Неверны логин или пароль")
-          }
-          if(response.status === 500){
-            throw new Error("Сервер упал");
-          }
-          return response.json();
-        }) 
+        })
         .then((user) => {
             setToken(`Bearer ${user.user.token}`);
             return fetchAndRenderComments()
@@ -50,20 +42,12 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
       } else {
         const login = document.querySelector('.login-input').value
         const password = document.querySelector('.password-input').value
-        const name = document.querySelector('.name-input').valueж
+        const name = document.querySelector('.name-input').value;
         registerUser({
           login: login,
           password: password,
           name: name
-      }).then((response) => {
-        if(response.status === 400){
-          throw new Error("Неверны логин или пароль")
-        }
-        if(response.status === 500){
-          throw new Error("Сервер упал");
-        }
-        return response.json();
-      }) 
+      })
       .then((user) => {
           setToken(`Bearer ${user.user.token}`);
           return fetchAndRenderComments()
