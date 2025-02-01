@@ -1,6 +1,7 @@
 import { answerComment, comments, initLikeButton, replaceComments } from "./main.js";
 import {token, postApi, fetchAndRenderComments, setToken} from "./api.js"
 import { renderLoginComponent, isLoginMode } from "../components/login-components.js";
+import { yourName } from "./api-login.js";
 
 const renderComments = () => {
   const appEl = document.querySelector('.app')
@@ -17,7 +18,7 @@ const renderComments = () => {
   let commentsHtml = comments.map((comment, index) => {
     return `<li class="comment" data-index="${index}">
     <div class="comment-header">
-      <div class="comment-name">${comment.user ? comment.user.name : "Неизвестно"}</div>
+      <div class="comment-name">${comment.user ? comment.user.name : "Аноним"}</div>
       <div>${comment.date}</div>
     </div>
     <div class="comment-body">
@@ -45,6 +46,8 @@ const renderComments = () => {
           type="text"
           class="add-form-name"
           placeholder="Введите ваше имя"
+          value = ${yourName}
+          readonly
         />
         <textarea
           type="textarea"
