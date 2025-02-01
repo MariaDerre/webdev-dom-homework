@@ -25,10 +25,6 @@ fetchAndRenderComments().then((responseData) => {
     };
   })
    renderComments(comments);
-})  
-.catch((error) => {
-  console.error(error)
-  throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
 })
 
 export const initLikeButton = () => {

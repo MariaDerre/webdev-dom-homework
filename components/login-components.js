@@ -1,7 +1,7 @@
 import { loginUser, registerUser } from "../modules/api-login.js";
 
+export let isLoginMode = true;
 export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments}) {
-  let isLoginMode = true; //если тру, то форма входа
 
   const renderForm = () => {
     const appHtml = 
@@ -43,6 +43,7 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
         const login = document.querySelector('.login-input').value
         const password = document.querySelector('.password-input').value
         const name = document.querySelector('.name-input').value;
+        
         registerUser({
           login: login,
           password: password,

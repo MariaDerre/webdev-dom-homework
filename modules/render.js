@@ -1,6 +1,6 @@
 import { answerComment, comments, initLikeButton, replaceComments } from "./main.js";
 import {token, postApi, fetchAndRenderComments, setToken} from "./api.js"
-import { renderLoginComponent } from "../components/login-components.js";
+import { renderLoginComponent, isLoginMode } from "../components/login-components.js";
 
 const renderComments = () => {
   const appEl = document.querySelector('.app')
@@ -17,7 +17,7 @@ const renderComments = () => {
   let commentsHtml = comments.map((comment, index) => {
     return `<li class="comment" data-index="${index}">
     <div class="comment-header">
-      <div class="comment-name">${comment.user?.name ?? "Неизвестно"}</div>
+      <div class="comment-name">${comment.user ? comment.user.name : "Неизвестно"}</div>
       <div>${comment.date}</div>
     </div>
     <div class="comment-body">
@@ -36,7 +36,10 @@ const renderComments = () => {
   const appHtml = 
   `<div class="container">
     ${commentsHtml}
-  ${token ?
+  ${!token ?`<div class = "form-loading" style="margin-top: 20px">
+    Что бы добавить комментарий, <a href='#' id="login-link" href='#'>авторизуйтесь</a>
+      </div> `   
+    :
     `<div class="add-form">
         <input
           type="text"
@@ -54,33 +57,34 @@ const renderComments = () => {
         </div>
       </div>
     </div>`
-    :
-    `<div class = "form-loading" style="margin-top: 20px">
-    Что бы добавить комментарий, <a href='#' id="go-to-login" href='#'>авторизуйтесь</a>
-      </div> `
   }
   </div>`
   appEl.innerHTML = appHtml;
+
+  const linkToLogin = document.querySelector("login-link");
+  linkToLogin?.addEventListener("click", () => {
+    renderLoginComponent();
+  });
   
-    //добавление комментария
-    const addButton = document.querySelector('.add-form-button');
-    
-    addButton.addEventListener('click', () => {
-    addButton.disabled = true;
-    addButton.textContent = 'Комментарий добавляется';
-    
-      postApi().then(() => {
-        return fetchAndRenderComments().then((responseData) => { //получаем обновленные комментарии
-          replaceComments(responseData); // обновляем комментарии
-          renderComments(responseData); // отображаем комментарии
-          })  
-          .catch((error) => {
-            console.error(error)
-            throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
-          })
+  //добавление комментария
+  const addButton = document.querySelector('.add-form-button');
+  
+  addButton.addEventListener('click', () => {
+  addButton.disabled = true;
+  addButton.textContent = 'Комментарий добавляется';
+  
+    postApi().then(() => {
+      return fetchAndRenderComments().then((responseData) => { //получаем обновленные комментарии
+        replaceComments(responseData); // обновляем комментарии
+        renderComments(responseData); // отображаем комментарии
+        })  
+        .catch((error) => {
+          console.error(error)
+          throw new Error ('Кажется, у вас сломался интернет, попробуйте позже')
         })
-      });
-      
+      })
+    });
+    
   const userName = document.querySelector('.add-form-name');
   const userComment = document.querySelector('.add-form-text');
   //валидация полей имя и комментарий
@@ -108,7 +112,6 @@ const renderComments = () => {
 initLikeButton;
 answerComment;
 
-fetchAndRenderComments();
 document.addEventListener('DOMContentLoaded', () => {
   renderComments();
 });
@@ -116,6 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initLikeButton();
     answerComment();
-  }
+}
 
   export {renderComments}
