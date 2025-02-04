@@ -4,7 +4,7 @@ export let isLoginMode = true;
 export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments}) {
 
   const renderForm = () => {
-    const appHtml = 
+    const loginHtml = 
     `   
     <div class="container">   
       <div class="login-form">
@@ -21,13 +21,23 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
           </div>
       </div>`
 
-    appEl.innerHTML = appHtml;
+    appEl.innerHTML = loginHtml;
 
     document.querySelector('.login-button').addEventListener("click", () => {
 
       if(isLoginMode) {
         const login = document.querySelector('.login-input').value
         const password = document.querySelector('.password-input').value
+
+        if (!login) {
+          alert("Введите логин");
+          return;
+      }
+
+      if (!password) {
+          alert("Введите пароль");
+          return;
+      }
 
         loginUser({
             login: login,
@@ -43,6 +53,16 @@ export function renderLoginComponent ({appEl, setToken, fetchAndRenderComments})
         const login = document.querySelector('.login-input').value
         const password = document.querySelector('.password-input').value
         const name = document.querySelector('.name-input').value;
+
+        if (!login) {
+            alert("Введите логин");
+            return;
+        }
+
+        if (!password) {
+            alert("Введите пароль");
+            return;
+        }
         
         registerUser({
           login: login,
