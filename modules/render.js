@@ -1,75 +1,95 @@
 import { answerComment, comments, initLikeButton, replaceComments } from "./main.js";
 import {token, postApi, fetchAndRenderComments, setToken} from "./api.js"
-import { renderLoginComponent, isLoginMode } from "../components/login-components.js";
+import { renderLoginComponent } from "../components/login-components.js";
 import { yourName } from "./api-login.js";
 
 const renderComments = () => {
   const appEl = document.querySelector('.app')
   if (!token) {
-    renderLoginComponent({
-    appEl, 
-    setToken,
-    fetchAndRenderComments,
-  })
+    // Если токена нет, показываем сообщение о необходимости авторизации
+    let commentsHtml = comments.map((comment, index) => {
+      return `<li class="comment" data-index="${index}">
+        <div class="comment-header">
+          <div class="comment-name">${comment.name}</div>
+          <div>${comment.date}</div>
+        </div>
+        <div class="comment-body">
+          <div class="comment-text">${comment.text}</div>
+        </div>
+        <div class="comment-footer">
+          <div class="likes">
+            <span class="likes-counter">${comment.likes}</span>
+            <button data-index='${index}' class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
+          </div>
+        </div>
+      </li>`;
+    }).join('');
 
-  return;
-}
+    const appHtml = 
+    `<div class="container">
+      <ul id="list" class="comments">
+        ${commentsHtml}
+      </ul>
+      <p>Чтобы написать комментарий, <a id="login-link" class="add-form-link" href='#'>авторизуйтесь</a></p>
+    </div>`;
+    
+    appEl.innerHTML = appHtml;
 
+    const linkToLogin = document.querySelector("#login-link");
+    linkToLogin?.addEventListener("click", () => {
+      renderLoginComponent({ appEl, setToken, fetchAndRenderComments });
+    });
+
+    return; // Выход из функции, так как нет токена
+  }
+
+  // Если токен есть, отображаем форму для добавления комментария
   let commentsHtml = comments.map((comment, index) => {
     return `<li class="comment" data-index="${index}">
-    <div class="comment-header">
-      <div class="comment-name">${comment.name}</div>
-      <div>${comment.date}</div>
-    </div>
-    <div class="comment-body">
-      <div class="comment-text">${comment.text}</div>
-    </div>
-    <div class="comment-footer">
-      <div class="likes">
-        <span class="likes-counter">${comment.likes}</span>
-        <button data-index='${index}' class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
+      <div class="comment-header">
+        <div class="comment-name">${comment.name}</div>
+        <div>${comment.date}</div>
       </div>
-    </div>
-  </li>`
+      <div class="comment-body">
+        <div class="comment-text">${comment.text}</div>
+      </div>
+      <div class="comment-footer">
+        <div class="likes">
+          <span class="likes-counter">${comment.likes}</span>
+          <button data-index='${index}' class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
+        </div>
+      </div>
+    </li>`;
   }).join('');
-  
 
   const appHtml = 
   `<div class="container">
-  <ul id="list" class="comments">
-    ${commentsHtml}
-  </ul>
-    ${!token ? `<div class = "form-loading" style="margin-top: 20px">
-    Что бы добавить комментарий, <a href='#' id="login-link" href='#'>авторизуйтесь</a>
-      </div> `   
-    :
-    `<div class="add-form">
-        <input
-          type="text"
-          class="add-form-name"
-          placeholder="Введите ваше имя"
-          value = ${yourName}
-          readonly
-        />
-        <textarea
-          type="textarea"
-          class="add-form-text"
-          placeholder="Введите ваш коментарий"
-          rows="4"
-        ></textarea>
-        <div class="add-form-row">
-          <button class="add-form-button">Написать</button>
-        </div>
+    <ul id="list" class="comments">
+      ${commentsHtml}
+    </ul>
+    <div class="add-form">
+      <input
+        type="text"
+        class="add-form-name"
+        placeholder="Введите ваше имя"
+        value="${yourName}"
+        readonly
+      />
+      <textarea
+        type="textarea"
+        class="add-form-text"
+        placeholder="Введите ваш комментарий"
+        rows="4"
+        readonly
+      ></textarea>
+      <div class="add-form-row">
+        <button class="add-form-button" disabled>Написать</button>
       </div>
-    </div>`
-  }
-  </div>`
+    </div>
+  </div>`;
+  
   appEl.innerHTML = appHtml;
 
-  const linkToLogin = document.querySelector("login-link");
-  linkToLogin?.addEventListener("click", () => {
-    renderLoginComponent();
-  });
   
   //добавление комментария
   const addButton = document.querySelector('.add-form-button');
