@@ -14,7 +14,6 @@ export function loginUser({login, password}) {
         return response.json();
     }).then((responseData) => {
         yourName = responseData.user.name;
-        console.log(yourName);
         return responseData;
     })
 }

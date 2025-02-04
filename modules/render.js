@@ -18,7 +18,7 @@ const renderComments = () => {
   let commentsHtml = comments.map((comment, index) => {
     return `<li class="comment" data-index="${index}">
     <div class="comment-header">
-      <div class="comment-name">${comment.user ? comment.user.name : "Аноним"}</div>
+      <div class="comment-name">${comment.name}</div>
       <div>${comment.date}</div>
     </div>
     <div class="comment-body">
@@ -36,8 +36,10 @@ const renderComments = () => {
 
   const appHtml = 
   `<div class="container">
+  <ul id="list" class="comments">
     ${commentsHtml}
-  ${!token ?`<div class = "form-loading" style="margin-top: 20px">
+  </ul>
+    ${!token ? `<div class = "form-loading" style="margin-top: 20px">
     Что бы добавить комментарий, <a href='#' id="login-link" href='#'>авторизуйтесь</a>
       </div> `   
     :
