@@ -1,12 +1,16 @@
 import {renderComments} from './render.js'
 import {fetchAndRenderComments} from "./api.js"
+import { format } from "date-fns";
 
 export let comments = [];
 export function replaceComments(data){
   comments = data.comments.map((comment) => {
+    const createDate = format(
+      new Date(comment.date),
+      "yyyy-MM-dd hh.mm.ss",)
           return {
             name: comment.author.name,
-            date: new Date().toLocaleString(),
+            date: createDate,
             text: comment.text,
             likes: comment.likes,
             isLiked: false,
@@ -62,12 +66,6 @@ fetchAndRenderComments();
 document.addEventListener('DOMContentLoaded', () => {
   renderComments();
 });
-
-//дата
-const currentDate = new Date();
-const optionsDate = { year: 'numeric', month: 'numeric', day: 'numeric' };
-const optionsTime = { hour: '2-digit', minute: '2-digit'};
-const formattedDate = currentDate.toLocaleDateString('ru-RU', optionsDate) + ' ' + currentDate.toLocaleTimeString('ru-RU', optionsTime);
 
 //лоудер
 window.addEventListener('load', function () {
