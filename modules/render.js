@@ -80,7 +80,6 @@ const renderComments = () => {
         class="add-form-text"
         placeholder="Введите ваш комментарий"
         rows="4"
-        readonly
       ></textarea>
       <div class="add-form-row">
         <button class="add-form-button" disabled>Написать</button>
