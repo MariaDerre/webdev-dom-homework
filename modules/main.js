@@ -7,7 +7,8 @@ export function replaceComments(data){
   comments = data.comments.map((comment) => {
     const createDate = format(
       new Date(comment.date),
-      "yyyy-MM-dd hh.mm.ss",)
+      "yyyy-MM-dd HH:mm:ss",)
+      console.log(createDate)
           return {
             name: comment.author.name,
             date: createDate,
@@ -20,9 +21,12 @@ export function replaceComments(data){
 //получение и отображение комментариев с апи
 fetchAndRenderComments().then((responseData) => {
   comments = responseData.comments.map(comment => {
+    const createDate = format(
+      new Date(comment.date),
+      "yyyy-MM-dd HH:mm:ss",)
     return {
       name: comment.author.name,
-      date: new Date().toLocaleString(),
+      date: createDate,
       text: comment.text,
       likes: comment.likes,
       isLiked: false,
